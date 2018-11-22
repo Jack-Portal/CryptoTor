@@ -1,5 +1,5 @@
 /**
- *
+ *  This class is defining a peer.
  */
 public class Peer {
     public final int publicKey;
