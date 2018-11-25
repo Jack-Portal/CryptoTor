@@ -1,0 +1,14 @@
+==> NODE CREATED
+==> CHOOSE PBK PVK
+==> SETUP PORT AND SERVER
+==> SEND INFO TO TRACKER
+
+Message to Tracker : CLEAR
+    CommunicationType : ITTERCLASS
+    NodePBK : INT
+    NodePort : PORT
+
+==> WAIT FOR ANSWER
+
+Received Answer : CLEAR
+    Success : BOOL

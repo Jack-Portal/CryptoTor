@@ -1,0 +1,52 @@
+==> INIT
+==> SEND TO TRACKER
+
+MessageToTrcker :
+    CommunicationType : ITTERCLASS
+
+
+==> WAIT FOR REPLY
+
+Reply : CLEAR
+    ListOfNodes: PORT[]
+
+
+==> CHOOSE K NODES: N1 N2 ..  NK
+==> CONTACT THE NODES AND SEND MESSAGE
+
+Message to send :
+    PeerPseudo : RANDOMSTRING
+    message : ENCRYPTED (with N1 pbk)
+        senderPBK : INT
+        NextNode : PORT (N2)
+        message : ENCRYPTED (with N2 pbk)
+            senderPBK : INT
+            NextNode : PORT (NK-1)
+            message : ENCRYPTED (with NK-1 pbk)
+                ...
+                senderPBK : INT
+                NextNode : PORT (NK)
+                message : ENCRYPTED (with NK pbk)
+                    senderPBK : INT
+                    NextNode : TRACKER
+                    MyFileList : String[]
+
+
+==> WAIT FOR RESPONSE
+
+Response:
+    message : ENCRYPTED (with Peer Pbk)
+        SymKey : INT
+        message : ENCRYPTED (with Peer pbk)
+            SymKey : INT
+            message : ENCRYPTED (with Peer pbk)
+                ...
+                SymKey : INT
+                message : ENCRYPTED (with Peer pbk)
+                    AvailableFiles : STRING []
+
+
+==> ADD AVAILABLE FILE LIST
+==> ADD SYM KEYS MAP
+==> WAIT FOR FILE REQUESTS
+

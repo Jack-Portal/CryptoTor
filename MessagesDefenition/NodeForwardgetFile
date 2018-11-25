@@ -1,0 +1,31 @@
+==> NODE WAITING FOR CONNECTION
+==> NEW CONNCTION FROM KNOWN PSEUDO
+==> DECRYPT TT
+
+Message Received :
+    PreviousPseudo : RANDOMSTRING
+    Message : ENCRYPTED (with Next NODE PBK)
+        CommunicationType : ITTERCLASS
+        Message: ENCRYPTED (with This Node Sym KEy)
+            FileName : STRING
+
+
+==> SEND
+
+Forward :
+    PreviousPseudo : RANDOMSTRING
+    Message : ENCRYPTED (with This NODE PBK)
+        CommunicationType : ITTERCLASS
+        Message: ENCRYPTED (with  This Node Sym KEy)
+
+
+==> Wait For Answer
+
+Received Answer:
+    message : ENCRYPTED (with this Node sym key)
+        File : BINARY
+
+==> SEND BACK
+
+SEND : DECRYPTED (with next Node sym key)
+    File : BINARY
