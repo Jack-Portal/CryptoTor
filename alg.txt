@@ -1,4 +1,4 @@
-Java Program on RSA Algorithm
+﻿Java Program on RSA Algorithm
 RSA algorithm is an asymmetric cryptography algorithm. Asymmetric means that it works on two different keys i.e. Public Key and Private Key. As the name suggests that the Public Key is given to everyone and Private Key is kept private.
 
 Algorithm
@@ -11,3 +11,5 @@ Step 6 : Public Key {e,n} Private Key {d,n}
 Step 7 : Cipher text C = Pe mod n  where P = plaintext
 Step 8 : For Decryption D = Dd mod n where D will give back the plaintext.
 If you need a dry run of the program or any other query, then kindly leave a comment in the comment box or mail me, I would be more than happy to help you.
+
+test
