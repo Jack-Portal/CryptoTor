@@ -1,14 +1,11 @@
 Message Received :
     PeerPseudo : RANDOMSTRING
     message : ENCRYPTED (with N1 pbk)
-        senderPBK : INT
         NextNode : PORT (N2)
         message : ENCRYPTED (with N2 pbk)
-            senderPBK : INT
             NextNode : PORT (NK-1)
             message : ENCRYPTED (with NK-1 pbk)
                 ...
-                senderPBK : INT
                 NextNode : PORT (NK)
                 message : ENCRYPTED (with NK pbk)
                     CommunicationType : ITTERCLASS
