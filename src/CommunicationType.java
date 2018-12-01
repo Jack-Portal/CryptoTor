@@ -2,6 +2,7 @@
  *
  **/
 
+/**
 public class COMMUNICATION{
     public static final INTEGER = [1, 2, 3, 4, 5];
     public static final STRING = ['init', 'get', 'send', 'forward', 'end']
@@ -12,3 +13,4 @@ public class COMMUNICATION{
         return INTEGER[STRING.find(S)]
     }
 }
+ **/

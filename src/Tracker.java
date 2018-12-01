@@ -10,12 +10,18 @@ import java.util.Scanner;
  *
  */
 public class Tracker{
+    public int port;
     public ArrayList<Integer> Nodes;
     public HashMap<Integer, String> NodePBK;
     public HashMap<String, Integer> FilesRDV;
     public HashMap<String, String> FilesCookies;
 
-    public void Tracker(){
+    public Tracker(int port){
+        this.port = port;
+        this.Nodes = new ArrayList<>();
+        this.NodePBK = new HashMap<>();
+        this.FilesRDV = new HashMap<>();
+        this.FilesCookies = new HashMap<>();
     }
 
     private void addNodes(String line){
@@ -49,16 +55,13 @@ public class Tracker{
 
 
     public static void main(String args[]) {
-        Tracker tracker = new Tracker();
-        tracker.Nodes = new ArrayList<>();
-        tracker.NodePBK = new HashMap<>();
-        tracker.FilesRDV = new HashMap<>();
-        tracker.FilesCookies = new HashMap<>();
-        connectToServer(9992, tracker);
+        int port = Integer.parseInt(args[0]);
+        Tracker tracker = new Tracker(port);
+        connectToServer(tracker);
     }
 
-    public static void connectToServer(int port, Tracker tracker) {
-        try(ServerSocket serverSocket = new ServerSocket(port)) {
+    public static void connectToServer(Tracker tracker) {
+        try(ServerSocket serverSocket = new ServerSocket(tracker.port)) {
 
             Socket connectionSocket = serverSocket.accept();
 

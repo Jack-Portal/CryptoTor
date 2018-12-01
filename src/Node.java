@@ -12,23 +12,19 @@ public class Node{
 
     public int pbKey;
     public int port;
-    public Tracker tracker;
+    public int tracker;
     private int pvKey;
     private Map<Node, Integer> symKeys;
     private Map<String, Node> cookies;
 
 
-//    public void Node(int port, int pbkey, int pvkey, Tracker tracker){
-//        this.port = port;
-//        this.pbKey = pbkey;
-//        this.tracker = tracker;
-//        this.pvKey = pvkey;
-//    }
-
-    public void Node(String port, String pbKey){
-        this.port = Integer.parseInt(port);
-        this.pbKey = Integer.parseInt(pbKey);
+    public Node(int port, int pbkey, int pvkey, int tracker){
+        this.port = port;
+        this.pbKey = pbkey;
+        this.tracker = tracker;
+        this.pvKey = pvkey;
     }
+
 
     private void newConnection(String newConnectionMessage){
         // decrypt with private key
@@ -55,9 +51,9 @@ public class Node{
         // functional programming ? do that action?
     }
 
-    public static void connectToServer(int Port) {
+    public static void connectToServer(Node node) {
         //Try connect to the server on an unused port eg 9991. A successful connection will return a socket
-        try(ServerSocket serverSocket = new ServerSocket(Port)) {
+        try(ServerSocket serverSocket = new ServerSocket(node.port)) {
             Socket connectionSocket = serverSocket.accept();
 
             //Create Input&Outputstreams for the connection
@@ -88,8 +84,14 @@ public class Node{
 
 
     public static void main(String args[]){
-        connectToServer(9991);
-        // create a server / socket
+        System.out.println(messages.S(args));
+        //choose pbk
+        int nodePort = Integer.parseInt(args[0]);
+        int pbk = 12;
+        int pvk = 31;
+        int tracker = Integer.parseInt(args[1]);
+        Node node = new Node(nodePort, pbk, pvk, tracker);
+        connectToServer(node);
         // connect to the Tracker and announce itself
         while(true){
             // wait for request

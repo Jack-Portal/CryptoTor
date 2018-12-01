@@ -2,24 +2,27 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.Map;
+
 
 /**
  *
  */
-public interface Node extends Threads{
 
+//public interface Nodes{
+/**
     public int pbKey;
     public int port;
     public Tracker tracker;
     private int pvKey;
-    private Map<Node, Integer> symKeys;
-    private Map<String,Node> cookies;
+    private Map<Nodes, Integer> symKeys;
+    private Map<String, Nodes> cookies;
 
 
     // initialisation
 
     public void Node(String someStuff){
-        // initialise Node here
+        // initialise Nodes here
     }
 
     private void tellNewNodeInitialisedTracker(int Tracker){
@@ -31,7 +34,7 @@ public interface Node extends Threads{
 
     private void getFile(String message){
         // ask tracker
-        // contact RDV Node / set up contact
+        // contact RDV Nodes / set up contact
         // get the file
         // send down
     }
@@ -44,7 +47,7 @@ public interface Node extends Threads{
     private void contactRDVNode(String message){
         // choose pseudo
         // choose sym key
-        // craft message for RDV Node
+        // craft message for RDV Nodes
     }
 
 
@@ -109,5 +112,5 @@ public interface Node extends Threads{
         //make server run
         
     }
-
-}
+**/
+//}

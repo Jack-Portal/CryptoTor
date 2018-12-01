@@ -4,11 +4,11 @@
 public abstract class CryptoAlgorithms {
 
     public static String symEncryption(String message, int key){
-        return message;
+        return "ENCRYPTED("+message+")";
     }
 
     public static String symDecryption(String message, int key){
-        return message;
+        return message.substring("ENCRYPTED(".length(), message.length()-1);
     }
 
     public static String asymEncryption(String message, int pbKey){
