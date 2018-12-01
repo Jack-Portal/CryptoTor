@@ -3,19 +3,19 @@
  */
 public abstract class CryptoAlgorithms {
 
-    public String symEncryption(String message, int key){
+    public static String symEncryption(String message, int key){
         return message;
     }
 
-    public String symDecryption(String message, int key){
+    public static String symDecryption(String message, int key){
         return message;
     }
 
-    public String asymEncryption(String message, int pbKey){
+    public static String asymEncryption(String message, int pbKey){
         return message;
     }
 
-    public String asymDecryption(String message, int pvKey){
+    public static String asymDecryption(String message, int pvKey){
         return message;
     }
 }
