@@ -54,28 +54,24 @@ public class Tracker{
     }
 
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws ClassNotFoundException {
         int port = Integer.parseInt(args[0]);
         Tracker tracker = new Tracker(port);
         connectToServer(tracker);
     }
 
-    public static void connectToServer(Tracker tracker) {
+    public static void connectToServer(Tracker tracker) throws ClassNotFoundException {
         try(ServerSocket serverSocket = new ServerSocket(tracker.port)) {
 
-            Socket connectionSocket = serverSocket.accept();
-
-            //Create Input&Outputstreams for the connection
-            InputStream inputToServer = connectionSocket.getInputStream();
-            OutputStream outputFromServer = connectionSocket.getOutputStream();
-
-            Scanner scanner = new Scanner(inputToServer, "UTF-8");
-            PrintWriter serverPrintOut = new PrintWriter(new OutputStreamWriter(outputFromServer, "UTF-8"), true);
-
-            serverPrintOut.println("Tracker initialised." );
-
             while(true) {
-                String line = scanner.nextLine();
+                Socket connectionSocket = serverSocket.accept();
+                //Create Input&Outputstreams for the connection
+                InputStream inputToServer = connectionSocket.getInputStream();
+                OutputStream outputFromServer = connectionSocket.getOutputStream();
+                ObjectInputStream ois = new ObjectInputStream(inputToServer);
+                PrintWriter serverPrintOut = new PrintWriter(new OutputStreamWriter(outputFromServer, "UTF-8"), true);
+                serverPrintOut.println("Tracker initialised." );
+                String line = (String) ois.readObject();
                 // creating node
                 if (line.startsWith("NEWNODE ")) {
                     tracker.addNodes(line.substring("NEWNODE ".length(), line.length()));
