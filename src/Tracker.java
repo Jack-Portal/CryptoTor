@@ -1,3 +1,7 @@
+/**
+ * Jacques-Antoine Portal
+ */
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;

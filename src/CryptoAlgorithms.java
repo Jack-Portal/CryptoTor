@@ -1,5 +1,6 @@
 /**
- *
+ * Jacques-Antoine Portal
+ * This was a class where my team mates would have integrated the algorithms they were working on....
  */
 public abstract class CryptoAlgorithms {
 
