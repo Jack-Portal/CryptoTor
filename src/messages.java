@@ -5,32 +5,17 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * This class just contains a few functions used by all the other classes.
  */
 public class messages {
-    public static final String[] allComType = {"GETFILE", "FORWARD", "INITNODE", "INITPEER", "CONTACT"};
 
-    public static String craftMessageUp(int[] symkeys, int[] Nodes, String firstPseudo, String finalMessage){
-        String msg = "comType: GETFILE, nextnode: TRACKER, msg: " + finalMessage;
-        for (int i = symkeys.length -1 ; i > 0 ; i-=1 ){
-            msg = CryptoAlgorithms.symEncryption(msg, symkeys[i]);
-            msg = "comType: FORWARD, nextnode: "+Nodes[i]+", msg: " +msg;
-        }
-        msg = CryptoAlgorithms.symEncryption(msg, symkeys[0]);
-        msg = "pseudo: "+firstPseudo+", msg: " +msg;
-        return msg;
-    }
-
-    public String forwardMessaegUp(String nextPseudo, String msg){
-        msg = "pseudo: "+nextPseudo+", msg:" +msg+",";
-        return msg;
-    }
-
-    public String craftMessageDown(String msgReceived, String lastPseudo, int thisNodeSymKey){
-        String msg = "pseudo: " + lastPseudo + ", msg: " + CryptoAlgorithms.symEncryption(msgReceived, thisNodeSymKey) +",";
-        return msg;
-    }
-
+    /**
+     * This function extracts elements out of a string ina  similar way a dictionary would.
+     * It is used to carry all the information and keep a consistant format between nodes, the tracker and the peers (as often as possible)
+     * @param keys
+     * @param msg
+     * @return
+     */
     public static Map<String, String> getValuesFromMsg(String[] keys, String msg){
         HashMap<String, String> values = new HashMap<String, String>() {};
         for (int i = 0; i<keys.length; i+=1){
@@ -48,32 +33,11 @@ public class messages {
         return values;
     }
 
-    public String craftInitMessage(){
-        return"";
-    }
-
-    public String crafinitResponse(){
-        return"";
-    }
-/*
-    public static void main(String args[]){
-        int[] nodes = {1, 2, 3};
-        int[] keys = {4, 5, 6};
-        String firstPseudo = "salut";
-        String finalMessage = "ceci est le final message";
-        String msg = craftMessageUp(keys, nodes, firstPseudo, finalMessage );
-        System.out.println( msg );
-        String[] extracted;
-        String[] toExtract1 = {"pseudo", "msg"};
-        extracted = getValuesFromMsg(toExtract1, msg);
-        System.out.println(S(extracted));
-        String[] toExtract2 = {"comType", "nextnode", "msg"};
-        extracted = getValuesFromMsg(toExtract2, extracted[extracted.length-1]);
-        System.out.println(S(extracted));
-        extracted = getValuesFromMsg(toExtract2, extracted[extracted.length-1]);
-        System.out.println(S(extracted));
-    }**/
-
+    /**
+     * This function takes an array and makes a string out of it
+     * @param Array
+     * @return
+     */
     public static String S(String[] Array){
         String toPrint = "[ ";
         for (String i : Array){
@@ -82,15 +46,12 @@ public class messages {
         toPrint = toPrint.substring(0, toPrint.length()-2) +" ]";
         return toPrint;
     }
-    public static String S(HashMap<String, String> map){
-        String toPrint = "[ ";
-        for (String i : map.values()){
-            toPrint += "'" + i + "', ";
-        }
-        toPrint = toPrint.substring(0, toPrint.length()-2) +" ]";
-        return toPrint;
-    }
 
+    /**
+     * self explanatory, used to generate symmetric keys and pseudonyms.
+     * @param length
+     * @return
+     */
     public static String generateRandomString(int length) {
         String randomString = "";
 
