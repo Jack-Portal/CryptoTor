@@ -1,71 +1,24 @@
-To build a network, First establish a tracker:
+To build a network, First initialise a tracker:
 
-Tracker.java:
-	----
-	public port (int)
-	public availableNodes (Node[])
-	public availableFiles (map file -> Node -> cookie)
-	----
-	public void Tracker(int port)
-	private void addNode(Node node)
-	private void addFile(String fileName, Node rdvNode, String cookie)
-	private void giveRDVNode(String fileName)
-	private void updateNode(Node newNode)
-	
-Then add as many Nodes as needed. You need a number of nodes that is bigger than
-the maximum number of Nodes used in a TOR circuit. 
+compile the tracker:
+javac Trackerjava
 
-Node.java:
-	----
-	public pbKey (int?)
-	public port (int)
-	public tracker (Tracker)
-	private pvKey (int?)
-	private symKeys (map Node -> int?)
-	private cookies (map String -> Node)
-	----
-	public void Node(int port, Tracker tracker)
-	private void newConnection(String newConnectionMessage)
-	private void transfer(String encryptedMessage)
+then run the Tracker program: 
+	example: java Tracker 5555
 	
-Then you can create Peers:
+Then create some Nodes: 
+javac Node.java 
+java Node 4440 5555
+java Node 444X 5555 ...
 
-Peer.java:
-	----
-	public pbKey (int?)
-	public tracker (Tracker)
-	public port (int)
-	private pvKey (int?)
-	private fileList (String[])
-	private torCircuit (Node[])
-	private randomCookie (String)
-	----
-	public void Peer(int port, String dir, Tracker tracker)
-	private void getFile(string fileName)
-	private void updateAvailableFiles()
-	private void changeTORConnection()
-	private void updateMyFiles()
-	
-	
-To function, use the following file containing encryption functions: AES and RSA
+We recommend at least 6 nodes, and they should all be launched from different command prompt,
+You should see that the tracker is adding them to it's attributes as they are created
+You should use the same port number for the tracker as before
 
-CryptoAlgorithms.java:
-	----
-	*no attributes*
-	----
-	public String symEncryption(String message, int? key)
-	public String symDecryption(String message, int? key)
-	public String asymEncryption(String message, int? pbKey)
-	public String asymDecryption(String message, int? pvKey)
-	
-	
-If you wish to have all of this done automatically, run the main program: main.java
-	
-	
-	
-	
-	
-	
-	
-	
+Then create Peers:
+javac Peer.java 
+java Peer 1110 5555 3
+java Peer 1111 5555 3
+
+Peers should be launched from a folder with the right files for the downloading to work... 	
 	
