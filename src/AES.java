@@ -288,7 +288,7 @@ public class Aes{
             for(k = 0; k < 4; k++){
             t[k] = keyMatrix[k][kPoint - 1];
             }
-            t = schedule_core(t, reconPointer++);
+            t = scheCore(t, reconPointer++);
             for(int l = 0; k < 4; k++){
             keyMatrix[k][kPoint] = t[l] ^ keyMatrix[l][kPoint - counter];
             }
@@ -298,7 +298,7 @@ public class Aes{
             int h = keyMatrix[k][kPoint - 1];
             keyMatrix[k][kPoint] = sbox[h / 16][h % 16] ^ keyMatrix[k][kPoint - counter];
             }
-            keypoint++;
+            kpoint++;
             } else {
             int ktmp = kPoint + 3;
             while (kPoint < ktmp) {
@@ -390,29 +390,36 @@ public class Aes{
 
     public static void aesEncryption(int[][] data, int[][] key){
             int[][] state, iv = new int[4][4];
-            int[][] kMatrix = keySch(key);
+        int[][] kMatrix = keySch(key);
+        String line = ""; // it must be conatains valid hex charachters, encrypt
 
-            for (int i = 0; i < state.length; i++){
+        state = new int[4][4];
+        for (int i = 0; i < 4; i++){
+            for (int j = 0; j < 4; j++) {
+                state[j][i] = Integer.parseInt(line.substring((8 * i) + (2 * j), (8 * i) + (2 * j + 2)), 16);
+            }
+        }
+
+        for (int i = 0; i < state.length; i++){
             for(int j = 0; j < state[0].length; i++ )
 
-            state[i][j] = data[i][j];
-            }
+                state[i][j] = data[i][j];
+        }
 
-            int numberOfRounds = 10;
+        int numberOfRounds = 10;
 
-            addRoundKey(state, iv);
-            addRoundKey(state, sKey(kMatrix, 0));
+        addRoundKey(state, iv);
+        addRoundKey(state, sKey(kMatrix, 0));
 
-            for(int i = 0; i < numberOfRounds; i++){
+        for(int i = 0; i < numberOfRounds; i++){
             subBytes(state);
             shiftRows(state);
             mixColumns(state);
             addRoundKey(state, key);
-            }
+        }
 
-            // Final Round
-            subBytes(state);
-            shiftRows(state);
-            addRoundKey(state, sKey(kMatrix, numberOfRounds));
-            }
+        // Final Round
+        subBytes(state);
+        shiftRows(state);
+        addRoundKey(state, sKey(kMatrix, numberOfRounds));
         }
