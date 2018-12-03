@@ -2,9 +2,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
 
 /**
  *
@@ -56,48 +55,60 @@ public class Tracker{
     }
 
 
-    public static void main(String args[]) throws ClassNotFoundException {
+    private static void handleConnection(Socket connectionSocket, Tracker tracker) throws IOException, ClassNotFoundException {
+        //Create Input&Outputstreams for the connection
+        InputStream inputToServer = connectionSocket.getInputStream();
+        OutputStream outputFromServer = connectionSocket.getOutputStream();
+        ObjectInputStream ois = new ObjectInputStream(inputToServer);
+        String line = (String) ois.readObject();
+        // creating node
+        if (line.startsWith("NEWNODE ")) {
+            tracker.addNodes(line.substring("NEWNODE ".length(), line.length()));
+        }
+        else if (line.startsWith("NEWFILES")) {
+            tracker.addFiles(line.substring("NEWFILES ".length(), line.length()));
+        }
+        else if (line.startsWith("GETFILE")) {
+            System.out.println("Request Received: " + line);
+            String toSend = tracker.getFile(line.substring("GETFILE ".length(), line.length()));
+            ObjectOutputStream oos = new ObjectOutputStream(outputFromServer);
+            oos.writeObject(toSend);
+            oos.flush();
+            System.out.println("sent");
+        }
+        else if(line.startsWith("NEWPEER")) {
+            System.out.println("NewPeer: ");
+            ObjectOutputStream oos = new ObjectOutputStream(outputFromServer);
+            oos.writeObject(tracker.Nodes);
+            oos.writeObject(tracker.NodePBK);
+            oos.flush();
+            System.out.println("sent");
+        }
+    }
+
+
+    public static void main(String args[]) throws ClassNotFoundException, IOException {
         int port = Integer.parseInt(args[0]);
         Tracker tracker = new Tracker(port);
         connectToServer(tracker);
     }
 
-    public static void connectToServer(Tracker tracker) throws ClassNotFoundException {
+    public static void connectToServer(Tracker tracker) throws IOException {
         try(ServerSocket serverSocket = new ServerSocket(tracker.port)) {
 
             System.out.println("Tracker initialised." );
             while(true) {
                 Socket connectionSocket = serverSocket.accept();
-                //Create Input&Outputstreams for the connection
-                InputStream inputToServer = connectionSocket.getInputStream();
-                OutputStream outputFromServer = connectionSocket.getOutputStream();
-                ObjectInputStream ois = new ObjectInputStream(inputToServer);
-                String line = (String) ois.readObject();
-                // creating node
-                if (line.startsWith("NEWNODE ")) {
-                    tracker.addNodes(line.substring("NEWNODE ".length(), line.length()));
-                }
-                else if (line.startsWith("NEWFILES")) {
-                    tracker.addFiles(line.substring("NEWFILES ".length(), line.length()));
-                }
-                else if (line.startsWith("GETFILE")) {
-                    System.out.println("Request Received: " + line);
-                    String toSend = tracker.getFile(line.substring("GETFILE ".length(), line.length()));
-                    ObjectOutputStream oos = new ObjectOutputStream(outputFromServer);
-                    oos.writeObject(toSend);
-                    oos.flush();
-                    System.out.println("sent");
-                }
-                else if(line.startsWith("NEWPEER")) {
-                    System.out.println("NewPeer: ");
-                    ObjectOutputStream oos = new ObjectOutputStream(outputFromServer);
-                    oos.writeObject(tracker.Nodes);
-                    oos.flush();
-                    System.out.println("sent");
-                }
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        handleConnection(connectionSocket, tracker);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

@@ -1,3 +1,8 @@
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  *
  */
@@ -25,8 +30,8 @@ public class messages {
         return msg;
     }
 
-    public static String[] getValuesFromMsg(String[] keys, String msg){
-        String[] values = new String[keys.length];
+    public static Map<String, String> getValuesFromMsg(String[] keys, String msg){
+        HashMap<String, String> values = new HashMap<String, String>() {};
         for (int i = 0; i<keys.length; i+=1){
             String toFind = keys[i]+": ";
             int starting = msg.indexOf(toFind) + toFind.length() ;
@@ -37,7 +42,7 @@ public class messages {
             else{
                 ending = msg.length();
             }
-            values[i] = msg.substring(starting, ending);
+            values.put(keys[i], msg.substring(starting, ending));
         }
         return values;
     }
@@ -49,7 +54,7 @@ public class messages {
     public String crafinitResponse(){
         return"";
     }
-
+/*
     public static void main(String args[]){
         int[] nodes = {1, 2, 3};
         int[] keys = {4, 5, 6};
@@ -66,11 +71,19 @@ public class messages {
         System.out.println(S(extracted));
         extracted = getValuesFromMsg(toExtract2, extracted[extracted.length-1]);
         System.out.println(S(extracted));
-    }
+    }**/
 
     public static String S(String[] Array){
         String toPrint = "[ ";
         for (String i : Array){
+            toPrint += "'" + i + "', ";
+        }
+        toPrint = toPrint.substring(0, toPrint.length()-2) +" ]";
+        return toPrint;
+    }
+    public static String S(HashMap<String, String> map){
+        String toPrint = "[ ";
+        for (String i : map.values()){
             toPrint += "'" + i + "', ";
         }
         toPrint = toPrint.substring(0, toPrint.length()-2) +" ]";
