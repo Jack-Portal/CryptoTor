@@ -22,3 +22,4 @@ java Peer 1111 5555 3
 
 Peers should be launched from a folder with the right files for the downloading to work... 	
 	
+https://github.com/Jack-Portal/CryptoTor
