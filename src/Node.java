@@ -91,7 +91,7 @@ public class Node{
         ObjectOutputStream oos = new ObjectOutputStream(outputStream);
         String encryptedMessage = CryptoAlgorithms.asymEncryption("comtype: GETFILE, cookie: "+cookie+", symKey: "+SymKey+
                 ", filename: "+fileName, pbKey);
-        String request = "pseudo: " + generateRandomString(20) + ", msg: " + encryptedMessage;
+        String request = "pseudo: " + messages.generateRandomString(20) + ", msg: " + encryptedMessage;
         oos.writeObject(request);
         oos.flush();
         System.out.println("sent " + request);
@@ -169,19 +169,6 @@ public class Node{
     }
 
 
-    public static String generateRandomString(int length) {
-        String randomString = "";
-
-        final char[] chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890".toCharArray();
-        final SecureRandom random = new SecureRandom();
-        for (int i = 0; i < length; i++) {
-            randomString = randomString + chars[random.nextInt(chars.length)];
-        }
-
-        return randomString;
-    }
-
-
     private static void handleConnection(Socket connectionSocket, Node node) throws IOException, ClassNotFoundException, ExecutionException, InterruptedException {
         //Create Input&Outputstreams for the connection
         InputStream inputToServer = connectionSocket.getInputStream();
@@ -239,6 +226,7 @@ public class Node{
         }
         else{
             String request = CryptoAlgorithms.asymDecryption(extractedInfo.get("msg"), node.pvKey);
+            //TODO Change where previous node is
             String[] requestExtract = {"previousNode", "comType", "nextNode", "symKey", "msg"};
             Map<String, String> requestInfo = messages.getValuesFromMsg(requestExtract,request);
             String response;
@@ -248,7 +236,7 @@ public class Node{
                     System.out.println("PEER INIT");
                     node.sender.put(pseudo, Integer.parseInt(requestInfo.get("previousNode")));
                     node.symKeys.put(pseudo, Integer.parseInt(requestInfo.get("symKey")));
-                    thisNodePseudo = generateRandomString(20);
+                    thisNodePseudo = messages.generateRandomString(20);
                     node.traceback.put(thisNodePseudo, pseudo);
                     node.forward.put(pseudo, thisNodePseudo);
                     response = forwardUp(requestInfo.get("msg"), Integer.parseInt(requestInfo.get("nextNode")), thisNodePseudo);
@@ -259,7 +247,7 @@ public class Node{
                     System.out.println("RDV MEETING");
                     node.sender.put(pseudo, Integer.parseInt(requestInfo.get("previousNode")));
                     node.symKeys.put(pseudo, Integer.parseInt(requestInfo.get("symKey")));
-                    thisNodePseudo = generateRandomString(20);
+                    thisNodePseudo = messages.generateRandomString(20);
                     node.traceback.put(thisNodePseudo, pseudo);
                     node.forward.put(pseudo, thisNodePseudo);
                     response = newPeer(node, thisNodePseudo, requestInfo.get("msg"));
@@ -272,8 +260,8 @@ public class Node{
                     String [] requestDownload = {"pseudotracker"};
                     requestInfo = messages.getValuesFromMsg(requestDownload,request);
                     String previousNode = node.traceback.get(requestInfo.get("pseudotracker"));
-                    int previousNodeport = node.sender.get(previousNode);
-                    response = GetFileFromPeer(previousNodeport, requestInfo.get("msg"));
+                    int previousNodePort = node.sender.get(previousNode);
+                    response = GetFileFromPeer(previousNodePort, requestInfo.get("msg"));
                     oos.writeObject(response);
                     oos.flush();
                     // forward down
@@ -295,10 +283,6 @@ public class Node{
         int tracker = Integer.parseInt(args[1]);
         Node node = new Node(nodePort, pbk, pvk, tracker);
         connectToServer(node);
-        //newPeer(node, "cookie", "salut.txt, yoyoyo.video, heyheyhey.pem");
-        //String a = askTracker(node, "salut.txt");
-        //String[] info = a.split(" ");
-        //String encryptedFile = contactRDVNode(Integer.parseInt(info[0]), Integer.parseInt(info[1]), "cookiie", "salut.txt");
         try(ServerSocket serverSocket = new ServerSocket(node.port)) {
 
             System.out.println("Tracker initialised." );

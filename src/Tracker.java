@@ -67,6 +67,11 @@ public class Tracker{
         }
         else if (line.startsWith("NEWFILES")) {
             tracker.addFiles(line.substring("NEWFILES ".length(), line.length()));
+            ObjectOutputStream oos = new ObjectOutputStream(outputFromServer);
+            oos.writeObject(tracker.FilesRDV.keySet());
+            oos.flush();
+            System.out.println("gave the list of files available");
+            //TODO get that back in Nodes and send it to peer
         }
         else if (line.startsWith("GETFILE")) {
             System.out.println("Request Received: " + line);
