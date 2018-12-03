@@ -35,22 +35,24 @@ public class Tracker{
 
     private void addFiles(String line){
         String[] lineSplit = line.split("/ ");
-        int nodeRDV = Integer.parseInt(lineSplit[0]);
-        String fileCookie = lineSplit[1];
-        String[] fileList = lineSplit[2].split(", ");
-        for (String file : fileList){
-            this.FilesCookies.put(file, fileCookie);
-            this.FilesRDV.put(file, nodeRDV);
+        if (lineSplit.length > 2 ) {
+            int nodeRDV = Integer.parseInt(lineSplit[0]);
+            String fileCookie = lineSplit[1];
+            String[] fileList = lineSplit[2].split(", ");
+            for (String file : fileList) {
+                this.FilesCookies.put(file, fileCookie);
+                this.FilesRDV.put(file, nodeRDV);
+            }
+            System.out.println("NEW FILES ADDED: NodeRDV: " + lineSplit[0] + ", NodeCookie: "
+                    + lineSplit[1] + ", FileList: " + lineSplit[2]);
         }
-        System.out.println("NEW FILES ADDED: NodeRDV: " + lineSplit[0]+ " NodeCookie: "
-                +  lineSplit[1] + " FileList: " + lineSplit[2]);
     }
 
-    private void getFile(String line, Tracker tracker, PrintWriter serverPrintOut){
-        int NodePort = tracker.FilesRDV.get(line);
-        String nodePBK = tracker.NodePBK.get(NodePort);
-        String fileCookie = tracker.FilesCookies.get(line);
-        serverPrintOut.println(NodePort+", "+nodePBK+", "+fileCookie);
+    private String getFile(String line){
+        int NodePort = this.FilesRDV.get(line);
+        String nodePBK = this.NodePBK.get(NodePort);
+        String fileCookie = this.FilesCookies.get(line);
+        return NodePort+", "+nodePBK+", "+fileCookie;
     }
 
 
@@ -63,24 +65,35 @@ public class Tracker{
     public static void connectToServer(Tracker tracker) throws ClassNotFoundException {
         try(ServerSocket serverSocket = new ServerSocket(tracker.port)) {
 
+            System.out.println("Tracker initialised." );
             while(true) {
                 Socket connectionSocket = serverSocket.accept();
                 //Create Input&Outputstreams for the connection
                 InputStream inputToServer = connectionSocket.getInputStream();
                 OutputStream outputFromServer = connectionSocket.getOutputStream();
                 ObjectInputStream ois = new ObjectInputStream(inputToServer);
-                PrintWriter serverPrintOut = new PrintWriter(new OutputStreamWriter(outputFromServer, "UTF-8"), true);
-                serverPrintOut.println("Tracker initialised." );
                 String line = (String) ois.readObject();
                 // creating node
                 if (line.startsWith("NEWNODE ")) {
                     tracker.addNodes(line.substring("NEWNODE ".length(), line.length()));
                 }
-                if (line.startsWith("NEWFILES")) {
+                else if (line.startsWith("NEWFILES")) {
                     tracker.addFiles(line.substring("NEWFILES ".length(), line.length()));
                 }
-                if (line.startsWith("GETFILE")) {
-                    tracker.getFile(line.substring("GETFILE ".length(), line.length()), tracker, serverPrintOut);
+                else if (line.startsWith("GETFILE")) {
+                    System.out.println("Request Received: " + line);
+                    String toSend = tracker.getFile(line.substring("GETFILE ".length(), line.length()));
+                    ObjectOutputStream oos = new ObjectOutputStream(outputFromServer);
+                    oos.writeObject(toSend);
+                    oos.flush();
+                    System.out.println("sent");
+                }
+                else if(line.startsWith("NEWPEER")) {
+                    System.out.println("NewPeer: ");
+                    ObjectOutputStream oos = new ObjectOutputStream(outputFromServer);
+                    oos.writeObject(tracker.Nodes);
+                    oos.flush();
+                    System.out.println("sent");
                 }
             }
         } catch (IOException e) {

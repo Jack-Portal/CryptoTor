@@ -7,6 +7,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import static java.lang.Thread.sleep;
 
 //TODO change who selects sym key, make the peer generate them
 
@@ -15,6 +18,7 @@ public class Node{
     public int pbKey;
     public int port;
     public int tracker;
+    public ServerSocket server;
     private int pvKey;
     private Map<Node, Integer> symKeys;
     private Map<String, Node> cookies;
@@ -25,6 +29,11 @@ public class Node{
         this.pbKey = pbkey;
         this.tracker = tracker;
         this.pvKey = pvkey;
+        try {
+            this.server = new ServerSocket(port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void newConnection(String newConnectionMessage){
@@ -92,9 +101,7 @@ public class Node{
     }
 
 
-    public static ServerSocket connectToServer(Node node) throws IOException {
-        //Try connect to the server on an unused port eg 9991. A successful connection will return a socket
-        ServerSocket serverSocket = new ServerSocket(node.port);
+    public static void connectToServer(Node node) throws IOException {
         Socket clientSocket = new Socket("127.0.0.1", node.tracker);
         OutputStream outputStream = clientSocket.getOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(outputStream);
@@ -102,11 +109,126 @@ public class Node{
         oos.writeObject(initString);
         oos.flush();
         System.out.println("Connected to Tracker / Ready!");
-        return serverSocket;
     }
 
 
-    public static void main(String args[]) throws IOException {
+    public static void newPeer(Node node, String fileCookies, String files) throws IOException {
+        Socket clientSocket = new Socket("127.0.0.1", node.tracker);
+        OutputStream outputStream = clientSocket.getOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+        String newFileString = "NEWFILES "+ node.port +"/ "+ fileCookies+"/ " + files;
+        oos.writeObject(newFileString);
+        oos.flush();
+        System.out.println("New Files given to the server: " + files);
+    }
+
+
+    public static String askTracker(Node node, String fileName) throws IOException, ClassNotFoundException, ExecutionException, InterruptedException {
+        Socket clientSocket = new Socket("127.0.0.1", node.tracker);
+
+        System.out.println("setting up output stream");
+        OutputStream outputStream = clientSocket.getOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+        String request = "GETFILE "+ fileName;
+        oos.writeObject(request);
+        oos.flush();
+        System.out.println("sent " + request);
+
+        System.out.println("waiting for reply");
+        InputStream inputToServer = clientSocket.getInputStream();
+        ObjectInputStream ois = new ObjectInputStream(inputToServer);
+        String response =  (String) ois.readObject();
+        System.out.println(response);
+        return response;
+    }
+
+
+    public static String contactRDVNode(int RDVNode, String message) throws IOException, ClassNotFoundException, ExecutionException, InterruptedException {
+        //encrypt tit with pbkey
+        // extract things out of message
+        Socket clientSocket = new Socket("127.0.0.1", RDVNode);
+
+        System.out.println("Contacting RDV Node");
+        OutputStream outputStream = clientSocket.getOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+        String request = "pseudo: " + "newRandomString" + ", msg: " + "ENCRYPTED: comtype: GETFILE, cookie: filename, symKey: "+"SYMKEY)";
+        oos.writeObject(request);
+        oos.flush();
+        System.out.println("sent " + request);
+
+        System.out.println("waiting for reply");
+        InputStream inputToServer = clientSocket.getInputStream();
+        ObjectInputStream ois = new ObjectInputStream(inputToServer);
+        String response =  (String) ois.readObject();
+        System.out.println(response);
+        return response; //pbbly add symkey
+    }
+
+
+    public static String GetFileFromPeer(int nextNode, String message) throws IOException, ClassNotFoundException, ExecutionException, InterruptedException {
+        //decrypt it with prvt key
+        // extract things out of message
+        //find next node
+        Socket clientSocket = new Socket("127.0.0.1", nextNode);
+
+        System.out.println("Contacting Peer");
+        OutputStream outputStream = clientSocket.getOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+        String request = "pseudo: " + "newRandomString" + ", msg: " + "ENCRYPTED: comtype: GETFILE, cookie: filename, symKey: "+"SYMKEY)";
+        oos.writeObject(request);
+        oos.flush();
+        System.out.println("sent " + request);
+
+        System.out.println("waiting for reply");
+        InputStream inputToServer = clientSocket.getInputStream();
+        ObjectInputStream ois = new ObjectInputStream(inputToServer);
+        String response =  (String) ois.readObject();
+        System.out.println(response);
+        return response;
+    }
+
+    public static void forwardUp(String Message, int nextNode, String pseudo, int key) throws IOException, ClassNotFoundException {
+        //decrypt
+        // extract things out of message
+        Socket clientSocket = new Socket("127.0.0.1", nextNode);
+
+        System.out.println("forwarding");
+        OutputStream outputStream = clientSocket.getOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+        String request = "pseudo: "+pseudo+", msg: decrypted message";
+        oos.writeObject(request);
+        oos.flush();
+        System.out.println("sent " + request);
+
+        System.out.println("waiting for reply");
+        InputStream inputToServer = clientSocket.getInputStream();
+        ObjectInputStream ois = new ObjectInputStream(inputToServer);
+        String response =  (String) ois.readObject();
+        System.out.println(response);
+    }
+
+    public static void forwardDown(String Message, int nextNode, String pseudo, int key) throws IOException, ClassNotFoundException {
+        // encrypt
+        // extract things out of message
+        Socket clientSocket = new Socket("127.0.0.1", nextNode);
+
+        System.out.println("forwarding");
+        OutputStream outputStream = clientSocket.getOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+        String request = "pseudo: "+pseudo+", msg: decrypted message";
+        oos.writeObject(request);
+        oos.flush();
+        System.out.println("sent " + request);
+
+        System.out.println("waiting for reply");
+        InputStream inputToServer = clientSocket.getInputStream();
+        ObjectInputStream ois = new ObjectInputStream(inputToServer);
+        String response =  (String) ois.readObject();
+        System.out.println(response);
+    }
+
+
+    public static void main(String args[]) throws IOException, ClassNotFoundException, ExecutionException, InterruptedException {
         System.out.println(messages.S(args));
         //choose pbk
         int nodePort = Integer.parseInt(args[0]);
@@ -114,9 +236,15 @@ public class Node{
         int pvk = 31;
         int tracker = Integer.parseInt(args[1]);
         Node node = new Node(nodePort, pbk, pvk, tracker);
-        ServerSocket serverSocket = connectToServer(node);
+        connectToServer(node);
+        Node node2 = new Node(4441, pbk, pvk, tracker);
+        connectToServer(node2);
+        newPeer(node, "cookie", "");
+        newPeer(node2, "cookiie", "salut.txt, yoyoyo.video, heyheyhey.pem");
+        String a = askTracker(node, "salut.txt");
+
         while(true) {
-            Socket connectionSocket = serverSocket.accept();
+            Socket connectionSocket = node.server.accept();
 
             //Create Input&Outputstreams for the connection
             InputStream inputToServer = connectionSocket.getInputStream();

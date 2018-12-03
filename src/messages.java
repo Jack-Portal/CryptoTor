@@ -25,7 +25,7 @@ public class messages {
         return msg;
     }
 
-    public static String[] getvaluesFromMsg(String[] keys, String msg){
+    public static String[] getValuesFromMsg(String[] keys, String msg){
         String[] values = new String[keys.length];
         for (int i = 0; i<keys.length; i+=1){
             String toFind = keys[i]+": ";
@@ -59,12 +59,12 @@ public class messages {
         System.out.println( msg );
         String[] extracted;
         String[] toExtract1 = {"pseudo", "msg"};
-        extracted = getvaluesFromMsg(toExtract1, msg);
+        extracted = getValuesFromMsg(toExtract1, msg);
         System.out.println(S(extracted));
         String[] toExtract2 = {"comType", "nextnode", "msg"};
-        extracted = getvaluesFromMsg(toExtract2, extracted[extracted.length-1]);
+        extracted = getValuesFromMsg(toExtract2, extracted[extracted.length-1]);
         System.out.println(S(extracted));
-        extracted = getvaluesFromMsg(toExtract2, extracted[extracted.length-1]);
+        extracted = getValuesFromMsg(toExtract2, extracted[extracted.length-1]);
         System.out.println(S(extracted));
     }
 
